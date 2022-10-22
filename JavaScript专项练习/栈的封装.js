@@ -25,7 +25,7 @@ function Stack() {
     Stack.prototype.toString = () => {
         let res = ''
         this.items.forEach(element => {
-            res += element + ''
+            res += element + ','
         })
         return res
     }
