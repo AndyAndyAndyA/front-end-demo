@@ -18,147 +18,188 @@ function DoublyLinkedList() {
 
     // 1.1 append()向列表尾部添加一个新的项
     DoublyLinkedList.prototype.append = data => {
-        // 1.1.1创建节点
+        // 1.根据元素创建节点
         let newNode = new Node(data)
 
-        // 1.1.2如果添加的是第一个节点, 那么要将head指针指向第一个节点
-        // 判断是否是第一个节点
-        if (this.length == 0) {
-            // 是第一个节点
+        // 2.判断列表是否为空列表
+        if (this.head == null) {
             this.head = newNode
+            this.tail = newNode
         } else {
-            // 不是第一个节点
-            // 找到最后一个节点
-            let current = this.head
-            while (current.next) {
-                current = current.next
-            }
-            // 将最后一个节点next指向新的节点
-            current.next = newNode
+            this.tail.next = newNode
+            newNode.prev = this.tail
+            this.tail = newNode
         }
 
-        // 1.1.3 length+1
-        this.length += 1
+        // 3.length+1
+        this.length++
     }
 
     // 1.2 insert()向列表的特定位置插入一个新的项
     DoublyLinkedList.prototype.insert = (position, data) => {
-        // 1.对position进行越界判断
+        // 1.判断越界的问题
         if (position < 0 || position > this.length) return false
 
-        // 2.根据data创建newNode
+        // 2.创建新的节点
         let newNode = new Node(data)
 
-        // 3.判断插入的位置是否是第一个
-        if (position == 0) {
-            newNode.next = this.head
-            this.head = newNode
+        // 3.判断插入的位置
+        if (position === 0) {
+            // 在第一个位置插入数据
+            // 判断链表是否为空
+            if (this.head == null) {
+                this.head = newNode
+                this.tail = newNode
+            } else {
+                this.head.prev = newNode
+                newNode.next = this.head
+                this.head = newNode
+            }
+        } else if (position === this.length) {
+            // 插入到最后的情况
+            // 思考: 这种情况是否需要判断链表为空的情况呢? 答案是不需要, 为什么?
+            this.tail.next = newNode
+            newNode.prev = this.tail
+            this.tail = newNode
         } else {
+            // 在中间位置插入数据
+            // 定义属性
             let index = 0
-            current = this.head
+            let current = this.head
             let previous = null
+
+            // 查找正确的位置
             while (index++ < position) {
                 previous = current
                 current = current.next
             }
+
+            // 交换节点的指向顺序
             newNode.next = current
+            newNode.prev = previous
+            current.prev = newNode
             previous.next = newNode
         }
 
         // 4.length+1
-        this.length += 1
+        this.length++
 
-        return true
+            return true
     }
 
     // 2.删除操作
 
     // 2.2 removeAt()从列表特定位置移除一项
     DoublyLinkedList.prototype.removeAt = position => {
-        // 不被引用就会倍当作垃圾回收
-        // 1.越界判断
+        // 1.判断越界的问题
         if (position < 0 || position >= this.length) return null
 
-        // 2.判断删除的是否是第一个节点
+        // 2.判断移除的位置
         let current = this.head
-        if (position == 0) {
-            this.head = this.head.next
+        if (position === 0) {
+            if (this.length == 1) {
+                this.head = null
+                this.tail = null
+            } else {
+                this.head = this.head.next
+                this.head.prev = null
+            }
+        } else if (position === this.length - 1) {
+            current = this.tail
+            this.tail = this.tail.prev
+            this.tail.next = null
         } else {
-            let previous = null
             let index = 0
+            let previous = null
+
             while (index++ < position) {
                 previous = current
                 current = current.next
             }
-            // 前一个节点的next指向current的next
-            previous.next = current.next
-        }
-        this.length -= 1
 
-        return current.data
+            previous.next = current.next
+            current.next.prev = previous
+        }
+
+        // 3.length-1
+        this.length--
+
+            return current.data
     }
 
     // 2.3 remove()从列表中移除一项
     DoublyLinkedList.prototype.remove = data => {
-        // 1.获取data在列表中的位置
-        let position = this.indexOf(data)
-            // 2.根据位置信息,删除节点
-        return this.removeAt(position)
+        let index = this.indexOf(data)
+        return this.removeAt(index)
     }
 
     // 3.获取操作
 
-    // 3.1 get()获取对应位置的元素
+    // get
     DoublyLinkedList.prototype.get = position => {
         // 1.越界判断
-        if (position < 0 || position >= this.length) return null //return null 表示什么都没有获取到
+        if (position < 0 || position >= this.length) return null
 
-        // 2.获取对应的data
-        let current = this.head
-        let index = 0
-        while (index++ < position) {
-            current = current.next
+        // 2.获取元素
+        if (this.length / 2 > position) {
+            let current = this.head
+            let index = 0
+            while (index++ < position) {
+                current = current.next
+            }
+            return current.data
         }
-        return current.data
+
+        if (this.length / 2 < position) {
+            let current = this.tail
+            let index = this.length - 1
+            while (index-- > position) {
+                current = current.prev
+            }
+            return current.data
+        }
     }
 
-    // 3.2 indexOf()返回索引
+    // 3.1 indexOf()返回索引
     DoublyLinkedList.prototype.indexOf = data => {
-        // 1.定义变量
+        // 1.定义变量保存信息
         let current = this.head
         let index = 0
 
-        // 2.开始查找
+        // 2.查找正确的信息
         while (current) {
-            if (current.data == data) {
+            if (current.data === data) {
                 return index
             }
+            index++
             current = current.next
-            index += 1
         }
-        // 3.找到最后没有找到返回-1
+
+        // 3.来到这个位置, 说明没有找到, 则返回-1
         return -1
     }
 
-    // 4.修改操作
-
-    // 4.1 update()修改某个位置的元素
-    DoublyLinkedList.prototype.update = (position, element) => {
-        // 1.越界判断
+    // update()
+    DoublyLinkedList.prototype.update = (position, newData) => {
+        // 越界判断
         if (position < 0 || position >= this.length) return false
 
-        // 2.获取对应的data
+        // 找到正确节点
         let current = this.head
         let index = 0
         while (index++ < position) {
             current = current.next
         }
-        return (current.data = element)
+
+        // 修改找到节点的data信息
+        current.data = newData
+
+        return true
     }
 
     // isEmpty()
     DoublyLinkedList.prototype.isEmpty = () => {
-        return this.length == 0
+        return this.length === 0
     }
 
     // size()
@@ -166,57 +207,93 @@ function DoublyLinkedList() {
         return this.length
     }
 
-    // toString()
-    DoublyLinkedList.prototype.toString = () => {
-        // 1.定义变量
-        let current = this.head
-        let listString = ''
-            // 2.循环获取每一个节点
-        while (current) {
-            listString += current.data + ' '
-            current = current.next
-        }
-        return listString
+    // 获取第一个元素
+    DoublyLinkedList.prototype.getHead = function() {
+        return this.head.data
+    }
+
+    // 获取最后一个元素
+    DoublyLinkedList.prototype.getTail = function() {
+        return this.tail.data
     }
 
     // forwardString:正向遍历的节点字符串形式
-    DoublyLinkedList.prototype.forwardString = () => []
+    DoublyLinkedList.prototype.forwardString = () => {
+        // 1.定义变量
+        let current = this.head
+        let forwardStr = ''
+
+        // 2.依次向后遍历,获取每一个节点
+        while (current) {
+            forwardStr += ',' + current.data
+            current = current.next
+        }
+
+        return forwardStr.slice(1)
+    }
 
     // backwardString:反向遍历的节点字符串形式
-    DoublyLinkedList.prototype.backwardString = () => []
+    DoublyLinkedList.prototype.backwardString = () => {
+        // 1.定义变量
+        let current = this.tail
+        let reverseStr = ''
+
+        // 2.依次向后遍历,获取每一个节点
+        while (current) {
+            reverseStr += ',' + current.data
+            current = current.prev
+        }
+
+        return reverseStr.slice(1)
+    }
+
+    // toString()
+    DoublyLinkedList.prototype.toString = () => {
+        return this.forwardString()
+    }
 }
 
 // 测试代码
-// 1.创建DoublyLinkedList
+// 1.创建双向链表对象
 let list = new DoublyLinkedList()
 
+// 2.追加元素
 list.append('abc')
 list.append('cba')
-list.append('aaa')
+list.append('nba')
+list.append('mba')
+
+// 3.获取所有的遍历结果
+console.log(list.forwardString()) // abc,cba,nba,mba
+console.log(list.backwardString()) // mba,nba,cba,abc
+console.log(list.toString()) // abc,cba,nba,mba
+
+// insert
+list.insert(2, 'sss')
 console.log(list.toString())
 
-list.insert(2, 'position')
-
+// removeAt
+list.removeAt(2)
 console.log(list.toString())
 
-console.log(list.get(3))
-console.log(list.indexOf('aaa'))
-list.update(0, '000')
+// remove
+list.remove('abc')
 console.log(list.toString())
 
-// 测试removeAt方法测试
-list.removeAt(0)
+// indexOf
+
+console.log(list.indexOf('cba'))
+
+// getHead
+
+console.log(list.getHead())
+
+// getTail
+console.log(list.getTail())
+
+// get
+console.log(list.get(1))
+
+// update
+list.update(0, 'kkk')
 console.log(list.toString())
-
-list.removeAt(0)
-console.log(list.toString())
-
-// 测试remove方法
-list.remove('aaa')
-console.log(list.toString())
-
-// 测试isEmpty方法
-console.log(list.isEmpty())
-
-// 测试size方法
-console.log(list.size())
