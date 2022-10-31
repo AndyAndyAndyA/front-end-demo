@@ -1,18 +1,12 @@
-let setA = new Set()
-let setB = new Set()
+var obj1 = {
+    a: 'hellow'
+}
+var obj2 = obj1
+obj2.a = 'world'
+console.log(obj1) //world
 
-setA.add('abc')
-setA.add('cba')
-setA.add('nba')
-setA.add('aaa')
-setA.add('bbb')
-setA.add('ccc')
-
-setB.add('asd')
-setB.add('sss')
-setB.add('ddd')
-setB.add('abc')
-setB.add('ccc')
-console.log(setA)
-
-console.log(setA.union(setB))
+function b() {
+    console.log(a)
+    var a = 1
+}
+b()
