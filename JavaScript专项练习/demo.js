@@ -1,10 +1,15 @@
-function Fun() {
-    // this.a = '在Fun函数中添加'
+var arr = [1, 2, 3, 4, 5, 1, 2, 3]
+
+function unique(arr) {
+    arr = arr.sort()
+    var brr = []
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] !== arr[i - 1]) {
+            brr.push(arr[i])
+        }
+    }
+
+    return brr
 }
 
-Fun.prototype.a = '在Fun原型添加的'
-let obj = new Fun()
-    // obj.a = '对象本身'
-obj.__proto__.a = '在对象原型添加的'
-
-console.log(obj.a)
+console.log(unique(arr))
